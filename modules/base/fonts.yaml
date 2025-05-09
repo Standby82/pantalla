@@ -1,0 +1,126 @@
+# ======================================================
+# CONFIGURACIÓN DE FUENTES PARA INTERFAZ DE USUARIO
+# ======================================================
+
+font:
+  # ---------------------------------------------------
+  # FAMILIA ROBOTO - FUENTE PRINCIPAL
+  # Diferentes tamaños para jerarquía visual
+  # ---------------------------------------------------
+  
+  # Tamaño XXL (72px) - Ideal para encabezados principales
+  - file: "gfonts://Roboto"  # Fuente importada desde Google Fonts
+    id: roboto72             # Identificador único para referencia
+    size: 72                 # Altura en píxeles
+    bpp: 8                   # 8 bits por píxel para calidad óptima
+
+  # Tamaño XL (48px) - Subtítulos destacados
+  - file: "gfonts://Roboto"
+    id: roboto48
+    size: 48
+    bpp: 8
+
+  # Tamaño Large (42px) - Para elementos importantes
+  - file: "gfonts://Roboto"
+    id: roboto42
+    size: 42
+    bpp: 8
+
+  # Tamaño Medium (36px) - Texto destacado
+  - file: "gfonts://Roboto"
+    id: roboto36
+    size: 36
+    bpp: 8
+
+  # Tamaño Normal (24px) - Texto corporal estándar
+  - file: "gfonts://Roboto"
+    id: roboto24
+    size: 24
+    bpp: 8
+
+  # Tamaño Small (20px) - Texto secundario
+  - file: "gfonts://Roboto"
+    id: roboto20
+    size: 20
+    bpp: 8
+
+  # Tamaño XS (18px) - Notas y detalles
+  - file: "gfonts://Roboto"
+    id: roboto18
+    size: 18
+    bpp: 8
+
+  # Tamaño XXS (14px) - Información menos relevante
+  - file: "gfonts://Roboto"
+    id: roboto14
+    size: 14
+    bpp: 8
+
+  # Tamaño mínimo (12px) - Solo para casos muy específicos
+  - file: "gfonts://Roboto"
+    id: roboto12
+    size: 12
+    bpp: 8
+
+  # ---------------------------------------------------
+  # ICONOS MATERIAL DESIGN
+  # Versión 7.4.47 de la librería oficial
+  # ---------------------------------------------------
+  
+  # Iconos medianos (24px) - Uso general
+  - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
+    id: light24
+    size: 24
+    bpp: 8
+    glyphs: [  # Selección optimizada de iconos
+      "\U000F0335",  # Bombilla (uso general)
+      "\U000F0769",  # Luz de techo
+      "\U000F06B5",  # Lámpara de mesa
+      "\U000F08DD",  # Lámpara de pie
+      "\U000F12BA",  # Luces de cadena
+      "\U000F0914",  # Luz de riel
+      "\U000F1A2F",  # Luz de mamparo
+      "\U000F07D6",  # Tira LED
+      "\U000F1020",  # Lámpara de coche
+      "\U000F1798",  # Luz de ventilador de techo
+      "\U000F02E3",  # Icono de cama
+      "\U000F05A8",  # Icono de sol
+      "\U000F00DF",   # Control de brillo
+      "\U000F0F65",    # Luna
+      "\U000F0583",    # Fuera
+      "\U000F0092"    # Vacas
+    ]
+
+  # Iconos grandes (40px) - Para elementos destacados
+  - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
+    id: light40
+    size: 40
+    bpp: 8
+    glyphs: [  # Mismos iconos que light24 pero en tamaño grande
+      "\U000F0335",
+      "\U000F0769",
+      "\U000F06B5",
+      "\U000F08DD",
+      "\U000F12BA",
+      "\U000F0914",
+      "\U000F1A2F",
+      "\U000F07D6",
+      "\U000F1020",
+      "\U000F1798",
+      "\U000F02E3",
+      "\U000F05A8",
+      "\U000F00DF",
+      "\U000F0F65",    # Luna
+      "\U000F0583",    # Fuera
+      "\U000F0092"    # Vacas
+    ]
+
+# ======================================================
+# MEJORES PRÁCTICAS DE USO
+# ======================================================
+# 1. Roboto 72-36px: Para títulos y texto destacado
+# 2. Roboto 24-18px: Para texto normal y botones
+# 3. Roboto 14-12px: Solo para información secundaria
+# 4. light24: Iconos en barras de herramientas
+# 5. light40: Iconos principales en pantallas grandes
+# ======================================================

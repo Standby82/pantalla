@@ -1,0 +1,61 @@
+---
+# Botón con control deslizante para una luz regulable (dimmer)
+# Variables esperadas:
+#   uid: identificador único del botón
+#   height: altura del botón
+#   text: nombre a mostrar
+#   icon: icono visual (carácter)
+#   entity_id: ID de la entidad de Home Assistant que controla la luz
+
+height: ${height}       # Altura del botón en píxeles (definido por variable)
+id: button_${uid}       # ID único del botón (usado para actualizaciones visuales o lógicas)
+
+widgets:                # Elementos dentro del botón
+
+  - label:
+      text_font: $icon_font     # Fuente usada para el icono
+      align: top_left           # Icono alineado arriba a la izquierda
+      id: icon_${uid}           # ID del icono
+      text: ${icon}             # Texto del icono
+
+  - label:
+      align: bottom_left        # Etiqueta de texto en la esquina inferior izquierda
+      id: label_${uid}          # ID del texto
+      text: ${text}             # Texto a mostrar (nombre del dispositivo)
+
+  - slider:                    # Control deslizante para el brillo
+      align: top_right          # Alineado arriba a la derecha
+      id: slider_${uid}         # ID único del slider
+      x: -5                     # Desplazamiento horizontal hacia la izquierda
+      y: 5                      # Desplazamiento vertical hacia abajo
+      width: 40                 # Ancho del slider
+      height: 165               # Altura del slider
+      pad_all: 0                # Sin relleno interior
+      min_value: 0              # Valor mínimo de brillo
+      max_value: 255            # Valor máximo de brillo
+      radius: 10px              # Bordes redondeados del slider
+
+      knob:                     # Estilo del "pomo" del slider
+        bg_color: white
+        radius: 2px
+        pad_left: 0
+        pad_right: 0
+        pad_top: 0
+        pad_bottom: 0
+
+      indicator:                # Estilo del indicador de progreso del slider
+        radius: 0px
+        bg_color: gray
+
+      on_release:               # Acción al soltar el control deslizante
+        - homeassistant.action:
+            action: light.turn_on       # Enciende la luz con el brillo elegido
+            data:
+              entity_id: ${entity_id}
+              brightness: !lambda return int(x);  # Valor del slider convertido a entero
+
+on_short_click:                # Acción al pulsar el botón
+  - homeassistant.action:
+      action: light.toggle            # Alterna entre encender/apagar la luz
+      data:
+        entity_id: ${entity_id}

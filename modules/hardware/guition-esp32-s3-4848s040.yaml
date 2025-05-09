@@ -1,0 +1,158 @@
+# ======================================================
+# CONFIGURACIÓN HARDWARE: Pantalla Inteligente Guition ESP32-S3-4848S040
+# Pantalla de 480px × 480px
+# ======================================================
+
+esphome:
+  min_version: 2025.4.0  # Versión mínima requerida de ESPHome
+  project:
+    name: "Guiton.ESP32-S3-4848S040"  # Identificador del proyecto
+    version: "1.0"  # Versión del firmware
+  platformio_options:
+    board_build.flash_mode: dio  # Modo de comunicación para la memoria flash
+
+# ======================================================
+# CONFIGURACIÓN DEL CHIP ESP32-S3
+# ======================================================
+esp32:
+  board: esp32-s3-devkitc-1  # Tipo de placa
+  variant: esp32s3  # Variante del chip
+  flash_size: 16MB  # Capacidad de memoria flash
+  
+  framework:
+    type: esp-idf  # Usando framework ESP-IDF
+    sdkconfig_options:  # Configuración avanzada del chip
+      COMPILER_OPTIMIZATION_SIZE: y  # Optimización para tamaño de código
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"  # Frecuencia CPU a 240MHz
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"  # Cache de datos de 64KB
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"  # Líneas de cache de 64B
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y  # Permite ejecutar código desde PSRAM
+      CONFIG_SPIRAM_RODATA: y  # Almacena datos de solo lectura en PSRAM
+
+# ======================================================
+# CONFIGURACIÓN DE PSRAM (Memoria RAM externa)
+# ======================================================
+psram:
+  mode: octal  # Modo octal para máximo rendimiento
+  speed: 80MHz  # Velocidad de operación
+
+# ======================================================
+# PREFERENCIAS DEL SISTEMA
+# ======================================================
+preferences:
+  flash_write_interval: 5min  # Intervalo para guardar preferencias en flash
+
+# ======================================================
+# SALIDAS INTERNAS
+# ======================================================
+output:
+  # Retroiluminación LED
+  - platform: ledc
+    pin: GPIO38  # Pin de control
+    id: gpio_backlight_pwm  # Identificador único
+    frequency: 100Hz  # Frecuencia PWM
+
+  # Relés internos (algunas versiones tienen 3 relés)
+  - id: internal_relay_1
+    platform: gpio
+    pin: 40
+  - id: internal_relay_2
+    platform: gpio
+    pin: 2    
+  - id: internal_relay_3
+    platform: gpio
+    pin: 1
+
+# ======================================================
+# CONFIGURACIÓN DE ILUMINACIÓN
+# ======================================================
+light:
+  - platform: monochromatic
+    output: gpio_backlight_pwm  # Usa el PWM definido anteriormente
+    name: Display Backlight  # Nombre descriptivo
+    id: display_backlight  # ID para referencia
+    restore_mode: ALWAYS_ON  # Siempre encendido al reiniciar
+
+# ======================================================
+# PANTALLA TÁCTIL GT911 (Interfaz I2C)
+# ======================================================
+i2c:
+  - id: bus_a  # Bus I2C
+    sda:
+      number: 19  # Pin SDA
+    scl:
+      number: 45  # Pin SCL
+      ignore_strapping_warning: true  # Ignora advertencias de strap
+
+touchscreen:
+  platform: gt911  # Controlador táctil
+  id: my_touchscreen  # Identificador
+  display: my_display  # Pantalla asociada
+  transform:
+    mirror_x: false  # No invertir eje X
+  # Opciones de depuración comentadas:
+  # on_touch:
+  #   - logger.log:
+  #       format: "Toque en (%d, %d)"
+  #       args: [touch.x, touch.y]
+
+# ======================================================
+# PANTALLA ST7701S (Interfaz SPI)
+# ======================================================
+spi:
+  - id: lcd_spi  # Configuración SPI
+    clk_pin: GPIO48  # Pin de reloj
+    mosi_pin: GPIO47  # Pin de datos
+
+display:
+  - platform: st7701s  # Controlador de pantalla
+    id: my_display  # Identificador único
+    update_interval: never  # Actualización manual
+    auto_clear_enabled: False  # No borrar automáticamente
+    spi_mode: MODE3  # Modo SPI
+    data_rate: 2MHz  # Velocidad de transmisión
+    color_order: RGB  # Orden de colores
+    invert_colors: False  # No invertir colores
+    dimensions:  # Resolución
+      width: 480
+      height: 480
+    # Pines de control
+    cs_pin: 39
+    de_pin: 18
+    hsync_pin: 16
+    vsync_pin: 17
+    pclk_pin: 21
+    pclk_frequency: 12MHz  # Frecuencia de pixel clock
+    # Temporización de señal
+    hsync_pulse_width: 8
+    hsync_front_porch: 10
+    hsync_back_porch: 20
+    vsync_pulse_width: 8
+    vsync_front_porch: 10
+    vsync_back_porch: 10
+    # Secuencia de inicialización personalizada
+    init_sequence:
+      - 1
+      - [ 0xFF, 0x77, 0x01, 0x00, 0x00, 0x10 ]  # Comando personalizado
+      - [ 0xCD, 0x00 ]  # Deshabilitar flag MDT
+    # Mapeo de pines de color
+    data_pins:
+      red:
+        - 11  # r1
+        - 12  # r2
+        - 13  # r3
+        - 14  # r4
+        - 0   # r5
+      green:
+        - 8   # g0
+        - 20  # g1
+        - 3   # g2
+        - 46  # g3
+        - 9   # g4
+        - 10  # g5
+      blue:
+        - 4   # b1
+        - 5   # b2
+        - 6   # b3
+        - 7   # b4
+        - 15  # b5

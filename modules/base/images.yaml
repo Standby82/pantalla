@@ -1,0 +1,54 @@
+# ======================================================
+# CONFIGURACIÓN DE RECURSOS GRÁFICOS (IMÁGENES)
+# ======================================================
+
+image:
+  # ---------------------------------------------------
+  # LOGO PRINCIPAL (Diferentes tamaños para pantallas)
+  # ---------------------------------------------------
+  
+  # Logo grande (450x90px) - Para pantalla de inicio
+  - file: https://esphome.io/_static/logo-text-on-light.svg  # Fuente remota
+    id: boot_logo_90px                                     # Identificador único
+    resize: 450x90                                        # Dimensiones finales (relación aspecto 5:1)
+    type: RGB565                                          # Formato de color optimizado para displays
+    transparency: alpha_channel                           # Soporte para transparencias
+
+  # Logo pequeño (100x20px) - Para versión compacta
+  - file: https://esphome.io/_static/logo-text-on-light.svg  # Mismo SVG fuente
+    id: boot_logo_20px
+    resize: 100x20                                         # Versión reducida
+    type: RGB565
+    transparency: alpha_channel
+
+  # ---------------------------------------------------
+  # ICONOS PERSONALIZADOS
+  # ---------------------------------------------------
+
+  # Icono de "Producido" (80x80px) - Cuadrado perfecto
+  - file: modules/assets/produced_icon.svg                # Archivo local
+    id: produced_icon_80px
+    resize: 80x80                                        # Dimensiones cuadradas
+    type: RGB565
+    transparency: alpha_channel                          # Importante para iconos
+
+  # Icono de "Red eléctrica OK" (30x30px) - Indicador pequeño
+  - file: modules/assets/grid_ok.svg                      # Archivo local
+    id: grid_ok_30px
+    resize: 30x30                                        # Tamaño compacto
+    type: RGB565
+    transparency: alpha_channel                          # Para fondos no cuadrados
+
+# ======================================================
+# MEJORES PRÁCTICAS DE USO
+# ======================================================
+# 1. boot_logo_90px: Para pantallas de inicio grandes
+# 2. boot_logo_20px: Para encabezados o pies de página
+# 3. produced_icon_80px: Como indicador destacado
+# 4. grid_ok_30px: Para indicadores de estado pequeños
+# 
+# Notas técnicas:
+# - RGB565: Formato que balancea calidad y rendimiento
+# - alpha_channel: Permite fondos transparentes
+# - SVG recomendado para escalado sin pérdida
+# ======================================================

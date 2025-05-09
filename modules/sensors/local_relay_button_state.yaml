@@ -1,0 +1,38 @@
+---
+# Relé local configurado como luz (light) binaria
+# Variables esperadas para sustituir en tiempo de compilación:
+#   uid: identificador único del dispositivo o botón
+#   ha_name: nombre que se mostrará en Home Assistant
+#   entity_id: identificador de la salida (por ejemplo, un GPIO o un switch)
+
+light:
+  - id: local_light_${uid}  # ID interno del componente de luz en ESPHome, único por cada dispositivo
+    name: ${ha_name}        # Nombre visible en Home Assistant
+    platform: binary        # Plataforma binaria: solo admite encendido/apagado
+    output: $entity_id      # Salida física o lógica que controla esta luz (relé, transistor, etc.)
+
+    # Acciones al encender la luz
+    on_turn_on:
+      then:
+        - lvgl.widget.update:  # Actualiza el botón en la interfaz gráfica (LVGL)
+            id: button_${uid}
+            bg_color: $button_on_color  # Cambia el color de fondo del botón al color configurado para encendido
+        - lvgl.widget.update:
+            id: icon_${uid}
+            text_color: $icon_on_color  # Cambia el color del icono al color configurado para encendido
+        - lvgl.widget.update:
+            id: label_${uid}
+            text_color: $label_on_color  # Cambia el color del texto (etiqueta) al color configurado para encendido
+
+    # Acciones al apagar la luz
+    on_turn_off:
+      then:
+        - lvgl.widget.update:
+            id: button_${uid}
+            bg_color: $button_off_color  # Cambia el color de fondo del botón al color de apagado
+        - lvgl.widget.update:
+            id: icon_${uid}
+            text_color: $icon_off_color  # Cambia el color del icono al color de apagado
+        - lvgl.widget.update:
+            id: label_${uid}
+            text_color: $label_off_color  # Cambia el color del texto al color de apagado

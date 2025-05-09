@@ -1,0 +1,104 @@
+# ======================================================
+# CONFIGURACIÓN AVANZADA DE LVGL (INTERFAZ GRÁFICA)
+# ======================================================
+
+lvgl:
+  # Configuración global de LVGL
+  page_wrap: true  # Permite el desplazamiento entre páginas
+  
+  # ---------------------------------------------------
+  # TEMA BASE PARA COMPONENTES
+  # ---------------------------------------------------
+  theme:
+    # Estilo base para todos los objetos
+    obj:
+      border_width: 0        # Sin bordes
+      pad_all: 0             # Sin relleno interno
+      bg_opa: TRANSP         # Fondo transparente
+      scrollable: false      # Deshabilita scroll
+      # outline_width: 1     # (Opcional) Para debugging
+      # outline_color: red   # Contorno rojo para visualizar elementos
+
+    # Estilo específico para etiquetas (labels)
+    label:
+      border_width: 0
+      scrollable: false
+      text_color: ${text_color}  # Usa variable de color definida
+      # outline_width: 1         # Debugging
+      # outline_color: red
+
+    # Estilo para imágenes
+    image:
+      border_width: 0
+      scrollable: false
+      # outline_width: 1         # Debugging
+      # outline_color: red
+
+    # Estilo para botones (configuración detallada)
+    button:
+      text_font: $text_font      # Fuente definida en variables
+      checkable: false           # No es un botón toggle
+      press_lock: false          # Permite pulsaciones rápidas
+      scroll_on_focus: true      # Desplaza al enfocar
+      radius: 25px               # Bordes redondeados (50% = circular)
+      width: $button_width       # Ancho desde variables
+      height: $button_height_single  # Alto desde variables
+      pad_all: 10px              # Relleno interno
+      shadow_width: 0            # Sin sombra (requerido explícitamente)
+      bg_color: $button_off_color  # Color de fondo inactivo
+      text_color: $label_off_color # Color de texto inactivo
+
+  # ---------------------------------------------------
+  # ESTILOS PERSONALIZADOS
+  # ---------------------------------------------------
+  style_definitions:
+    - id: page_style            # Identificador único
+      bg_color: black           # Color de fondo inicial
+      bg_opa: cover             # Opacidad completa
+      pad_all: 5                # Pequeño margen interno
+
+# ======================================================
+# SELECTOR DE TEMA (DARK/LIGHT MODE)
+# ======================================================
+select:
+  - platform: template
+    name: "Current Theme"       # Nombre en Home Assistant
+    id: current_theme           # ID para referencia
+    icon: mdi:theme-light-dark  # Ícono apropiado
+    optimistic: true            # Cambio inmediato
+    options:                    # Opciones disponibles
+      - Dark                    # Modo oscuro
+      - Light                   # Modo claro
+    initial_option: Light       # Tema por defecto
+    on_value:                   # Acciones al cambiar
+      then:
+        # Cambio a tema oscuro
+        - if:
+            condition:
+              - lambda: 'return id(current_theme).state == "Dark";'
+            then:
+              - lvgl.style.update:  # Actualiza estilo de página
+                  id: page_style
+                  bg_color: black
+              - lvgl.widget.redraw  # Fuerza redibujado
+        
+        # Cambio a tema claro
+        - if:
+            condition:
+              - lambda: 'return id(current_theme).state == "Light";'
+            then:
+              - lvgl.style.update:
+                  id: page_style
+                  bg_color: white
+              - lvgl.widget.redraw
+
+# ======================================================
+# MEJORES PRÁCTICAS IMPLEMENTADAS
+# ======================================================
+# 1. Diseño responsive con variables para tamaños
+# 2. Sistema de temas intercambiables
+# 3. Estilos base consistentes
+# 4. Opciones de debugging comentadas
+# 5. Integración con Home Assistant
+# 6. Redibujado optimizado al cambiar temas
+# ======================================================

@@ -1,0 +1,10 @@
+---
+# Botón básico transparente, sin acción ni widgets internos
+# Variables esperadas:
+#   uid: identificador único del botón
+#   height: altura del botón
+
+height: ${height}       # Altura del botón definida mediante una variable
+bg_opa: TRANSP          # Fondo completamente transparente (sin color de fondo)
+checkable: no           # El botón no es seleccionable o conmutable (no se queda "marcado")
+id: button_${uid}       # ID único del botón, útil para identificarlo y actualizarlo

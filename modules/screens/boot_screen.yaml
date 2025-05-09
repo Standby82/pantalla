@@ -1,0 +1,81 @@
+---
+# Pantalla de arranque (Boot Screen) mostrada al iniciar el dispositivo
+
+widgets:
+  - obj:  # Objeto contenedor principal de la pantalla
+      id: boot_screen  # ID único para poder referenciar esta pantalla
+      layout:
+        type: flex               # Usa diseño flexible
+        flex_flow: COLUMN_WRAP  # Los widgets se colocan en columna, y envuelven si no hay espacio
+      height: ${screen_height}  # Altura total de la pantalla, usando una variable
+      width: ${screen_width}    # Anchura total de la pantalla, usando una variable
+      text_font: $text_font     # Fuente usada en los textos, se define en una variable
+      scrollable: false         # No se permite desplazamiento (scroll)
+      bg_color: white           # Color de fondo blanco
+      bg_opa: COVER             # Opacidad total
+      radius: 0                 # Sin bordes redondeados
+      pad_all: 5                # Margen interno de 5 píxeles en todos los lados
+
+      # Widgets contenidos en la pantalla de arranque
+      widgets:
+        - image:
+            src: boot_logo_90px  # Imagen de arranque (por ejemplo, logo)
+            pad_bottom: 10       # Espaciado inferior de 10 píxeles
+
+        - label:
+            id: esphome_version_label
+            text_color: black
+            text:
+              format: "ESPHome Version: %s"  # Muestra la versión de ESPHome
+              args: [ 'id(esphome_version).state.c_str()' ]
+
+        - label:
+            text_color: black
+            text:
+              format: "Build Date: %s - %s"  # Muestra la fecha y hora de compilación
+              args: [__DATE__, __TIME__]
+
+        - label:
+            id: connected_mac_label
+            text_color: black
+            text: "MAC Address: Not Connected"  # Texto por defecto hasta que se conecte
+
+        - label:
+            id: ip_address_label
+            text_color: black
+            text: "IP Address: Not Connected"  # Dirección IP hasta que se establezca la conexión
+
+        - label:
+            id: connected_ssid_label
+            text_color: black
+            text: "Connected SSID: Not Connected"  # Nombre de red WiFi (SSID) no conectado
+
+        - label:
+            id: wifi_signal_db_percent_label
+            text_color: black
+            text: "WiFi Strength: Not Connected"  # Intensidad de señal WiFi sin conexión
+
+        - obj:  # Contenedor para el botón inferior
+            radius: 0
+            pad_all: 0
+            border_width: 0
+            width: ${screen_width}
+            flex_grow: 1  # Hace que este objeto crezca para empujar el botón al fondo
+
+            widgets:
+              - button:
+                  align: bottom_right  # Alineado abajo a la derecha
+                  x: -10               # Desplazado 10 píxeles a la izquierda
+                  radius: 15          # Bordes redondeados
+                  width: 100
+                  height: 60
+                  checkable: true     # Permite marcar el botón (tipo toggle, aunque aquí no se usa)
+
+                  widgets:
+                    - label:
+                        text_color: white
+                        align: center
+                        text: "OK"  # Texto del botón
+
+                  on_press:
+                    - lvgl.widget.hide: boot_screen  # Oculta la pantalla de arranque al pulsar "OK"

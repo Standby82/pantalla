@@ -1,0 +1,38 @@
+# ======================================================
+# SECCIÓN: EVENTO AL INICIAR (ON_BOOT)
+# ======================================================
+esphome:
+  on_boot:
+    priority: -100  # Prioridad de ejecución (más bajo = se ejecuta antes)
+    then:
+      - delay: $boot_screen_delay  # Espera el tiempo definido en las variables
+      - lvgl.widget.hide: boot_screen  # Oculta la pantalla de inicio después del delay
+
+# ======================================================
+# SECCIÓN: API DE ESPHOME
+# ======================================================
+api:
+  # Configuración de la API para comunicación con Home Assistant
+  # Sin parámetros = usa configuración por defecto
+  # Permite control remoto y monitoreo del dispositivo
+
+# ======================================================
+# SECCIÓN: CONFIGURACIÓN DEL LOGGER (REGISTROS)
+# ======================================================
+logger:
+  # Nivel de logging por defecto (comentado = usa nivel por defecto)
+  # level: info
+  
+  # Configuración específica por módulo (ejemplo comentado):
+  # logs:
+  #   i2c.idf: info       # Nivel info para logs del bus I2C
+  #   touchscreen: info   # Nivel info para la pantalla táctil
+  #   scheduler: none     # Desactiva logs del planificador
+
+# ======================================================
+# SECCIÓN: CONFIGURACIÓN DE LVGL (INTERFAZ GRÁFICA)
+# ======================================================
+lvgl:
+  displays:
+    - my_display  # Define un display llamado "my_display"
+                 # (La configuración detallada estaría en otro archivo o sección)

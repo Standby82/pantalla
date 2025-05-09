@@ -1,0 +1,166 @@
+# ======================================================
+# SECCIÓN: CONFIGURACIÓN SOLAR (AUTOMATIZACIONES BASADAS EN SOL)
+# ======================================================
+sun:
+  latitude: !secret latitude       # Latitud geográfica (almacenada en secrets.yaml)
+  longitude: !secret longitude     # Longitud geográfica (almacenada en secrets.yaml)
+  
+  # Acciones al atardecer:
+  on_sunset:
+    - elevation: -3.5°             # Cuando el sol está 3.5° bajo el horizonte (crepúsculo civil)
+      then:
+        - select.set:
+            id: brightness_mode
+            option: "Evening"      # Cambia a modo "Evening" (tarde)
+
+  # Acciones al amanecer:
+  on_sunrise:
+    - then:
+        - select.set:
+            id: brightness_mode
+            option: "Day"         # Cambia a modo "Day" (día)
+
+# ======================================================
+# SECCIÓN: CONFIGURACIÓN DE TIEMPO Y PROGRAMACIONES
+# ======================================================
+time:
+  - platform: homeassistant        # Sincroniza con el reloj de Home Assistant
+    id: system_time
+    on_time_sync:                  # Cuando se sincroniza el tiempo:
+      - if: # Actualiza la última hora de reinicio
+          condition:
+            lambda: 'return id(device_last_restart).state == "";'  # Si no hay registro
+          then:
+            - text_sensor.template.publish:
+                id: device_last_restart
+                state: !lambda 'return id(system_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'  # Formato: "Mon 01 Jan 2023 - 12:34:56 PM"
+
+    # Programaciones horarias:
+    on_time:
+      # Activa modo "Night" a la hora configurada (ej. 00:00)
+      - seconds: 0
+        minutes: $screen_night_minute
+        hours: $screen_night_hour
+        then:
+          - select.set:
+              id: brightness_mode
+              option: "Night"
+
+      # Activa modo "Evening" a la hora configurada (ej. 17:30)
+      - seconds: 0
+        minutes: $screen_day_minute
+        hours: $screen_day_hour
+        then:
+          - select.set:
+              id: brightness_mode
+              option: "Evening"
+
+      # Ejecuta el script de actualización de hora cada minuto
+      - minutes: '*'
+        seconds: 0
+        then:
+          - script.execute: time_update
+
+# ======================================================
+# SECCIÓN: COMPORTAMIENTO DE LVGL EN INACTIVIDAD
+# ======================================================
+lvgl:
+  on_idle:
+    timeout: $touchscreen_idle_timeout  # Tiempo para considerar inactividad (ej. 30s)
+    then:
+      - logger.log: "LVGL is idle"      # Registra evento
+      # Ajusta brillo según el modo actual:
+      - if:
+          condition:
+            - lambda: 'return id(brightness_mode).state == "Day";'
+          then:
+            - light.turn_on:
+                id: display_backlight
+                brightness: ${touchscreen_daytime_brightness}  # Brillo al 100%
+      - if:
+          condition:
+            - lambda: 'return id(brightness_mode).state == "Evening";'
+          then:
+            - light.turn_on:
+                id: display_backlight
+                brightness: ${touchscreen_nighttime_brightness}  # Brillo al 50%
+      - if:
+          condition:
+            - lambda: 'return id(brightness_mode).state == "Night";'
+          then:
+            - light.turn_off: display_backlight  # Apaga pantalla
+            - lvgl.pause:
+                show_snow: true                 # Opcional: muestra animación de nieve
+
+# ======================================================
+# SECCIÓN: REACCIÓN AL TACTO DE PANTALLA
+# ======================================================
+touchscreen:
+    on_touch:  # Cuando se detecta toque
+      then:
+        - logger.log: "LVGL is active"  # Registra evento
+        - lvgl.resume                  # Reactiva LVGL
+        - lvgl.widget.redraw           # Redibuja widgets
+        # Restablece brillo según modo actual:
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Day";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_daytime_brightness}
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Evening";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_nighttime_brightness}
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Night";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_nighttime_brightness}
+
+# ======================================================
+# SECCIÓN: SELECTOR DE MODO DE BRILLO
+# ======================================================
+select:
+  - platform: template
+    name: "Brightness mode"       # Nombre en Home Assistant
+    id: brightness_mode           # ID para referencias internas
+    icon: mdi:television-shimmer  # Ícono en HA
+    optimistic: true              # Actualización inmediata
+    options:                      # Opciones disponibles:
+      - Day                       # Modo día (máximo brillo)
+      - Evening                   # Modo tarde (brillo medio)
+      - Night                     # Modo noche (pantalla apagada)
+    initial_option: Day           # Valor inicial
+    on_value:                     # Acciones al cambiar modo:
+      then:
+        - lvgl.resume
+        - lvgl.widget.redraw
+        # Ajusta brillo según selección:
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Day";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_daytime_brightness}
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Evening";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_nighttime_brightness}
+        - if:
+            condition:
+              - lambda: 'return id(brightness_mode).state == "Night";'
+            then:
+              - light.turn_on:
+                  id: display_backlight
+                  brightness: ${touchscreen_nighttime_brightness}

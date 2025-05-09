@@ -1,0 +1,26 @@
+---
+# Botón en la interfaz que controla un relé local (local relay)
+# Variables esperadas:
+#   uid: identificador único para vincular el botón con su lógica
+#   height: altura del botón
+#   text: texto que mostrará el botón (ej: nombre del dispositivo)
+#   icon: carácter o símbolo del icono (ej: código Unicode)
+#   entity_id: ID de la entidad asociada al relé
+
+height: ${height}       # Altura del botón en la interfaz, definida mediante variable
+id: button_${uid}       # ID único del botón (usado para modificar colores o acciones)
+
+widgets:                # Elementos visuales dentro del botón
+  - label:
+      text_font: $icon_font     # Fuente usada para el icono (normalmente una fuente tipo símbolo)
+      align: top_left           # Icono alineado arriba a la izquierda
+      id: icon_${uid}           # ID del icono (para actualizar su color desde lógica)
+      text: ${icon}             # Texto del icono (carácter visual)
+
+  - label:
+      align: bottom_left        # Etiqueta de texto alineada abajo a la izquierda
+      id: label_${uid}          # ID del texto (para cambiar color o texto dinámicamente)
+      text: ${text}             # Texto mostrado (por ejemplo, "Luz salón")
+
+on_short_click:                 # Acción al hacer un toque corto sobre el botón
+  light.toggle: local_light_${uid}  # Alterna el estado del relé/luz asociado

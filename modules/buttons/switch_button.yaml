@@ -1,0 +1,29 @@
+---
+# Botón en la interfaz que alterna (toggle) un interruptor de Home Assistant
+# Variables esperadas:
+#   uid: identificador único del botón (debe coincidir con el sensor/estado)
+#   height: altura visual del botón
+#   text: texto que se mostrará (por ejemplo, "Ventilador")
+#   icon: carácter o símbolo que representa el icono
+#   entity_id: entidad de Home Assistant que se va a alternar
+
+height: ${height}        # Altura del botón, controlada por variable
+id: button_${uid}        # ID único del botón para referenciarlo desde lógica o estilos
+
+widgets:                 # Elementos visuales dentro del botón
+  - label:
+      text_font: $icon_font    # Fuente del icono (normalmente tipo símbolo)
+      align: top_left          # Icono alineado arriba a la izquierda
+      id: icon_${uid}          # ID del icono (para actualizarlo según estado)
+      text: ${icon}            # Texto que representa el icono visual
+
+  - label:
+      align: bottom_left       # Texto alineado en la parte inferior izquierda
+      id: label_${uid}         # ID del texto (para cambios dinámicos)
+      text: ${text}            # Texto que se mostrará (nombre del dispositivo)
+
+on_short_click:                # Acción que se ejecuta al tocar el botón
+  - homeassistant.action:
+      action: switch.toggle     # Alterna el estado del interruptor en Home Assistant
+      data:
+        entity_id: ${entity_id} # Entidad específica a controlar

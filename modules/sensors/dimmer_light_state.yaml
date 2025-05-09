@@ -1,0 +1,21 @@
+---
+# Estado de un botón de luz tipo dimmer (con brillo regulable)
+# Variables esperadas:
+#   uid: identificador único que debe coincidir con el botón o slider correspondiente
+#   entity_id: ID de la entidad de Home Assistant que controla la luz regulable
+
+sensor:
+  - id: brightness_${uid}  # ID interno del sensor que recibe el nivel de brillo
+    platform: homeassistant  # Plataforma: obtiene datos desde Home Assistant
+    entity_id: ${entity_id}  # Entidad de la que se lee el valor (una luz regulable)
+    attribute: brightness     # Se extrae el atributo "brightness" de la entidad
+
+    # Acción al recibir un nuevo valor de brillo
+    on_value:
+      - lvgl.slider.update:
+          id: slider_${uid}    # Actualiza el slider de la interfaz gráfica
+          value: !lambda return x;  # Establece el valor del slider al brillo recibido
+
+# Incluye el archivo switch_or_light_button_state.yaml, que contiene lógica adicional
+# para actualizar la interfaz gráfica en función del estado del botón (colores, etc.)
+<<: !include ./switch_or_light_button_state.yaml

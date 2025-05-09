@@ -1,0 +1,127 @@
+# ======================================================
+# CONFIGURACIÓN DE BOTONES DEL SISTEMA
+# ======================================================
+button:
+  # Botón de reinicio suave
+  - platform: restart
+    name: "Restart"               # Nombre visible en Home Assistant
+    entity_category: config       # Categoría en HA (aparece en configuración)
+
+  # Botón de restablecimiento de fábrica (¡Cuidado!)
+  - platform: factory_reset
+    name: "Factory Reset"         # Etiqueta clara para evitar confusiones
+    id: Reset                    # ID para referencias internas
+    entity_category: config      # Agrupado con opciones de configuración
+
+# ======================================================
+# SENSORES DE MONITOREO DEL SISTEMA
+# ======================================================
+sensor:
+  # Sensor de señal WiFi en dBm (valor crudo)
+  - platform: wifi_signal
+    name: "WiFi Signal dB"        # Nombre descriptivo
+    id: wifi_signal_db            # ID para referencia
+    update_interval: 60s          # Actualización cada minuto
+    internal: true                # No se expone a HA (uso interno)
+
+  # Versión porcentual de la señal WiFi (0-100%)
+  - platform: copy                 # Copia y transforma el valor anterior
+    id: wifi_signal_db_percent     # Nuevo ID
+    source_id: wifi_signal_db      # Fuente de datos
+    name: "WiFi Strength"         # Nombre amigable
+    icon: mdi:wifi                # Ícono representativo
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);  # Conversión a %
+      - throttle: 60s             # Limita actualizaciones
+    unit_of_measurement: "%"      # Unidad clara
+    entity_category: diagnostic   # Categoría en HA
+    on_value:                     # Actualización de UI
+        then:
+          - lvgl.label.update:    # Actualiza etiqueta LVGL
+              id: wifi_signal_db_percent_label
+              text:
+                format: "Wi-Fi Strength: %.0f%%"  # Formato visual
+                args: [ 'id(wifi_signal_db_percent).state' ]  # Valor dinámico
+
+# ======================================================
+# SENSORES BINARIOS (ESTADO DEL SISTEMA)
+# ======================================================
+binary_sensor:
+  # Indicador de estado general
+  - platform: status
+    name: "Status"                # Nombre genérico
+    icon: mdi:check-network-outline  # Ícono intuitivo
+    entity_category: diagnostic   # Para monitoreo
+
+# ======================================================
+# SENSORES DE TEXTO (INFORMACIÓN DEL SISTEMA)
+# ======================================================
+text_sensor:
+  # Versión de ESPHome
+  - platform: version
+    id: esphome_version          # ID único
+    name: 'ESPHome Version'      # Nombre descriptivo
+    hide_timestamp: true         # Oculta marca de tiempo
+    icon: mdi:source-branch      # Ícono temático
+    entity_category: diagnostic  # Propósito claro
+
+  # Último reinicio registrado
+  - platform: template
+    id: device_last_restart      # Referencia única
+    name: 'Last Restart'         # Nombre autoexplicativo
+    icon: mdi:clock              # Ícono adecuado
+    entity_category: diagnostic  # Para registro histórico
+
+  # Información de red WiFi
+  - platform: wifi_info
+    mac_address:
+      id: mac_address            # Identificador único
+      name: "MAC Address"        # Etiqueta clara
+      icon: mdi:network-pos      # Ícono representativo
+      entity_category: diagnostic
+    ip_address:
+      id: ip_address             # ID para referencia
+      name: "IP Address"         # Nombre estándar
+      icon: mdi:ip-network       # Ícono reconocible
+      entity_category: diagnostic
+      on_value:                  # Actualización en tiempo real
+        then:
+          - lvgl.label.update:   # Actualiza múltiples etiquetas
+              id: ip_address_label
+              text:
+                format: "IP Address: %s"
+                args: [ 'id(ip_address).state.c_str()' ]
+          - lvgl.label.update:
+              id: connected_mac_label
+              text:
+                format: "MAC Address: %s"
+                args: [ 'id(mac_address).state.c_str()' ]
+          - lvgl.label.update:
+              id: esphome_version_label
+              text:
+                format: "ESPHome Version: %s"
+                args: [ 'id(esphome_version).state.c_str()' ]
+    ssid:
+      id: connected_ssid         # ID para SSID
+      name: "Connected SSID"     # Nombre descriptivo
+      icon: mdi:wifi-check       # Ícono contextual
+      entity_category: diagnostic
+      on_value:                 # Actualización en UI
+        then:
+          - lvgl.label.update:
+              id: connected_ssid_label
+              text:
+                format: "Connected SSID: %s"
+                args: [ 'id(connected_ssid).state.c_str()' ]
+
+# ======================================================
+# MEJORES PRÁCTICAS IMPLEMENTADAS
+# ======================================================
+# 1. Nombres descriptivos y autoexplicativos
+# 2. Categorización adecuada en Home Assistant
+# 3. Íconos intuitivos del set Material Design
+# 4. Actualización en tiempo real de la interfaz LVGL
+# 5. Filtros para transformación de datos (dBm a %)
+# 6. Intervalos de actualización optimizados
+# 7. IDs únicos para cada componente
+# ======================================================

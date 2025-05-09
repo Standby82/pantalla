@@ -1,0 +1,50 @@
+# ======================================================
+# SECCIÓN: DEFINICIÓN DE COLORES PERSONALIZADOS
+# ======================================================
+color:
+    # Colores personalizados con nombres descriptivos
+    - id: burnt_sienna       # Color tierra oscuro/anaranjado
+      hex: 'CC5E14'          # Código hexadecimal RGB
+    - id: very_dark_gray     # Gris casi negro
+      hex: '313131'
+    - id: ep_orange          # Naranja corporativo
+      hex: 'F37320'
+    - id: ep_blue            # Azul corporativo
+      hex: '01B4DE'
+    - id: ep_green           # Verde corporativo
+      hex: '7ACF38'
+
+    # ======================================================
+    # ESCALA DE GRISES (ordenados de claro a oscuro)
+    # ======================================================
+    - id: gray50             # Gris muy claro (casi blanco)
+      hex: 'FAFAFA'
+    - id: gray100
+      hex: 'F5F5F5'
+    - id: gray200
+      hex: 'EEEEEE'
+    - id: gray300
+      hex: 'E0E0E0'
+    - id: gray400            # Gris medio
+      hex: 'BDBDBD'
+    - id: gray500
+      hex: '9E9E9E'
+    - id: gray600
+      hex: '757575'
+    - id: gray700
+      hex: '616161'
+    - id: gray800            # Gris oscuro
+      hex: '424242'
+    - id: gray900            # Gris muy oscuro (casi negro)
+      hex: '212121'
+
+# Nota: La tabla de colores RGB estándar ya viene incluida en ESPHome
+# Los siguientes colores están comentados como referencia pero no son necesarios
+# ya que son nativos del sistema. Se muestran como ejemplo de la paleta disponible.
+
+# Ejemplo de colores RGB estándar (comentados):
+# - id: aliceblue
+#   hex: 'F0F8FF'
+# - id: antiquewhite
+#   hex: 'FAEBD7'
+# ... (lista completa de colores HTML/CSS disponibles)

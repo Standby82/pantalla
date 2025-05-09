@@ -1,0 +1,37 @@
+---
+# Sensor binario que representa el estado de un interruptor o luz
+# Variables esperadas:
+#   uid: identificador único que debe coincidir con el ID del botón correspondiente
+#   entity_id: identificador de la entidad de Home Assistant que queremos monitorizar
+
+binary_sensor:
+  - id: widget_sensor_${uid}  # ID interno del sensor binario en ESPHome
+    platform: homeassistant   # Plataforma: recibe el estado de una entidad de Home Assistant
+    entity_id: ${entity_id}   # ID de la entidad de Home Assistant que estamos monitorizando
+    publish_initial_state: true  # Publica el estado inicial al iniciar ESPHome
+
+    # Acción a ejecutar cuando cambia el estado de la entidad
+    on_state:
+      - if:
+          condition:
+            - binary_sensor.is_on: widget_sensor_${uid}  # Si la entidad está encendida (ON)
+          then:
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_on_color  # Actualiza el color del botón a encendido
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_on_color  # Actualiza el color del icono a encendido
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_on_color  # Actualiza el color de la etiqueta a encendido
+          else:  # Si está apagada (OFF)
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_off_color  # Actualiza el color del botón a apagado
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_off_color  # Actualiza el color del icono a apagado
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_off_color  # Actualiza el color de la etiqueta a apagado

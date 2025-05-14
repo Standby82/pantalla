@@ -1,0 +1,312 @@
+# ======================================================
+# VARIABLES DE SUSTITUCIÓN (Reutilizables en todo el código)
+# ======================================================
+substitutions:
+  # Iconos Unicode para diferentes tipos de luces/iluminación
+  lightbulb:         "\U000F0335"         # Bombilla estándar
+  ceiling_light:     "\U000F0769"         # Luz de techo
+  lamp:              "\U000F06B5"         # Lámpara de mesa
+  floor_lamp:        "\U000F08DD"         # Lámpara de pie
+  string_lights:     "\U000F12BA"         # Luces de cadena
+  track_light:       "\U000F0914"         # Luz de riel
+  bulkhead_light:    "\U000F1A2F"         # Luz de mamparo
+  led_strip:         "\U000F07D6"         # Tira LED
+  coach_lamp:        "\U000F1020"         # Lámpara de coche
+  ceiling_fan_light: "\U000F1798"         # Luz de ventilador de techo
+  bed:               "\U000F02E3"         # Icono de cama
+  sunny:             "\U000F05A8"         # Icono de sol
+  luna:              "\U000F0F65"
+  fuera:             "\U000F0583"
+  vacas:             "\U000F0092"
+
+
+  # Configuraciones de estilo y apariencia
+  icon_font: light40                      # Fuente para iconos
+  text_font: roboto24                    # Fuente para texto
+  text_color: white                      # Color del texto
+  bg_color: black                        # Color de fondo
+  button_on_color: "ep_blue"           # Color de botón activado
+  button_off_color: "very_dark_gray"     # Color de botón desactivado
+  icon_on_color: "yellow"                # Color de icono activado
+  icon_off_color: "white"                 # Color de icono desactivado
+  label_on_color: "white"                # Color de etiqueta activada
+  label_off_color: "white"               # Color de etiqueta desactivada
+  button_text_color: "white"             # Color del texto en botones
+  
+  # Dimensiones de botones
+  button_height_single: '109px'          # Altura de botón simple
+  button_height_double: '228px'          # Altura de botón doble 228 anterior
+  button_width: '109px'                 # Ancho estándar de botones
+  
+  # Configuración de pantalla táctil
+  touchscreen_idle_timeout: 10s        # Tiempo de inactividad antes de apagar pantalla
+  touchscreen_daytime_brightness: "100%" # Brillo diurno
+  touchscreen_nighttime_brightness: "50%" # Brillo nocturno
+  
+  # Configuración de pantalla de inicio (boot)
+  boot_screen_delay: 10s                 # Tiempo que muestra pantalla de inicio
+
+  # Configuración de modo nocturno (se activa a medianoche)
+  screen_night_hour: '0'                 # Hora (24h)
+  screen_night_minute: '0'               # Minuto
+
+  # Configuración de modo diurno (se activa a las 5:30am)
+  screen_day_hour: '5'                   # Hora (24h)
+  screen_day_minute: '30'                # Minuto
+
+  # Tamaño de la pantalla
+  screen_height: '480px'                 # Altura en píxeles
+  screen_width: '480px'                  # Ancho en píxeles
+
+# ======================================================
+# CONFIGURACIÓN PRINCIPAL DE ESPHome
+# ======================================================
+esphome:
+  name: "guition-esp32-s3-4848s040"       # ID único del dispositivo
+  friendly_name: "Guition480"            # Nombre amigable para interfaces
+  comment: "Guition ESP32-4848S040 480px * 480px Smart Screen" # Descripción
+
+
+
+# ======================================================
+# PAQUETES/INCLUSIONES DE CONFIGURACIONES EXTERNAS
+# ======================================================
+packages:
+  # Configuraciones base para el hardware ESP32
+  wifi: !include modules/base/wifi.yaml              # Configuración WiFi
+  base: !include modules/base/base.yaml             # Configuración básica del ESP32
+  touchscreen: !include modules/base/touchscreen.yaml # Pantalla táctil
+  backlight: !include modules/base/backlignt.yaml    # Retroiluminación
+  colors: !include modules/base/color.yaml          # Definiciones de colores
+  fonts: !include modules/base/fonts.yaml           # Fuentes tipográficas
+  images: !include modules/base/images.yaml         # Imágenes/assets
+  sensors: !include modules/sensors/sensors_base.yaml # Sensores básicos
+  theme_style: !include modules/base/theme_style.yaml # Estilos y temas
+
+
+  # Configuración específica del hardware
+  hardware: !include modules/hardware/guition-esp32-s3-4848s040.yaml
+
+  # Secciones para sincronización con Home Assistant:
+  # - Botón 1: Controla un relé local con actualización de estado
+  button_1_state: !include
+    file: modules/sensors/local_relay_button_state.yaml
+    vars:
+      uid: button_1                     # Identificador único
+      ha_name: Relay 1                  # Nombre en Home Assistant
+      entity_id: internal_relay_1       # Entidad asociada en HA
+
+  # - Botón 2: Control estándar para luz/interruptor
+  button_2_state: !include
+    # file: modules/sensors/switch_or_light_button_state.yaml
+    file: modules/sensors/local_relay_button_state.yaml
+    vars:
+      uid: button_2
+      ha_name: Relay 2
+      entity_id: internal_relay_2
+      #entity_id: "switch.athom_smart_plug_v3_50ebc0_switch" # Entidad en HA
+
+  # - Botón 3: Control estándar para luz/interruptor
+  button_3_state: !include
+    # file: modules/sensors/switch_or_light_button_state.yaml
+    file: modules/sensors/local_relay_button_state.yaml
+    vars:
+      uid: button_3
+      ha_name: Relay 3
+      entity_id: internal_relay_3
+
+  # - Botón 4: Control estándar para luz/interruptor
+  button_4_state: !include
+    file: modules/sensors/local_relay_button_state.yaml
+    vars:
+      uid: button_4
+      ha_name: Relay 3
+      entity_id: internal_relay_3
+  
+  # - Botón 5: Control de luz regulable (dimmer)
+  button_5_state: !include
+    file: modules/sensors/dimmer_light_state.yaml
+    vars:
+      uid: button_5
+      entity_id: light.athom_rgb_light_d93662_rgb_light_strip # Luz RGB en HA
+      
+# ======================================================
+# SCRIPT DE ACTUALIZACIÓN DE HORA (se ejecuta cada segundo)
+# ======================================================
+
+script:
+  - id: time_update
+    then:
+      - lvgl.indicator.update:
+          id: second_hand
+          value: !lambda |-
+            return id(system_time).now().second;
+      - lvgl.indicator.update:
+          id: minute_hand
+          value: !lambda |-
+            return id(system_time).now().minute;
+      - lvgl.indicator.update:
+          id: hour_hand
+          value: !lambda |-
+            auto now = id(system_time).now();
+            return std::fmod(now.hour, 12) * 60 + now.minute;
+
+
+
+# ======================================================
+# INTERFAZ DE USUARIO (LVGL - Pantallas y botones)
+# ======================================================
+lvgl:
+  # Pantalla de inicio (boot)
+  top_layer: !include
+    file: modules/screens/boot_screen.yaml
+    vars:
+      height: $screen_height            # Hereda altura de variables
+      width: $screen_width              # Hereda ancho de variables
+
+  # Página principal
+  pages:
+    - id: main_page
+      layout:
+        type: flex                      # Diseño flexible
+        #flex_flow: COLUMN_WRAP          # Organización en columnas
+        flex_flow: ROW_WRAP    
+      width: 100%                       # Ancho completo
+      styles: page_style                # Estilo aplicado
+      widgets:
+        # Botón 1: Relé local (altura doble)
+        - button: !include
+            file: modules/buttons/local_relay_button.yaml
+            vars:
+              uid: button_1
+              height: $button_height_single
+              text: Dia         # Texto del botón
+              icon: $sunny          # Icono (de variables)
+
+        # Botón 2: Interruptor estándar
+        - button: !include
+            file: modules/buttons/local_relay_button.yaml
+            vars:
+              uid: button_2
+              height: $button_height_single
+              text: Noche         # Texto del botón
+              icon: $luna          # Icono (de variables)
+
+        # Botón 3: Interruptor estándar
+        - button: !include
+            file: modules/buttons/local_relay_button.yaml
+            vars:
+              uid: button_3
+              height: $button_height_single
+              text: Fuera         # Texto del botón
+              icon: $fuera          # Icono (de variables)
+
+        # Botón 4: Interruptor estándar
+        - button: !include
+            file: modules/buttons/local_relay_button.yaml
+            vars:
+              uid: button_4
+              height: $button_height_single
+              text: Vacas         # Texto del botón
+              icon: $vacas          # Icono (de variables)
+
+        #--- Reloj digital (nuevo widget) ---
+        - obj:
+              height: 270
+              width: 100% # 270 y la de abajo fuera
+              x: 50%
+              align: center
+              #flex_grow: 1
+              pad_all: 4
+              bg_color: Black
+              border_width: 0
+              widgets:
+              - meter:
+                  #height: 100%
+                  #width: 100%
+                  height: 270
+                  width: 270
+                  align: center
+                  bg_color: White
+
+                  scales:
+                    # Minor ticks
+                    - ticks:
+                        width: 2
+                        count: 61
+                        length: 10
+                        color: Black
+                      range_from: 0
+                      range_to: 60
+                      angle_range: 360
+                      rotation: 270
+
+                      # Minuite hand
+                      indicators:
+                        - line:
+                            id: minute_hand
+                            width: 3
+                            color: Black
+                            r_mod: -1
+                    # Major ticks
+                    - angle_range: 330
+                      rotation: 300
+                      range_from: 1
+                      range_to: 12
+                      ticks:
+                        width: 3
+                        count: 12
+                        length: 20
+                        color: yellow
+
+                    # Hour hand
+                    - angle_range: 360
+                      rotation: 270
+                      range_from: 0
+                      range_to: 720
+                      indicators:
+                        - line:
+                            id: hour_hand
+                            width: 4
+                            color: Black
+                            r_mod: -40
+
+                    # Second hand
+                    - angle_range: 360
+                      rotation: 270
+                      range_from: 0
+                      range_to: 60
+                      indicators:
+                        - line:
+                            id: second_hand
+                            width: 2
+                            color: Red
+                            r_mod: -10
+
+              - button:
+                  id: boton_reloj
+                  width: 80
+                  height: 80
+                  align: center        # centrado encima del meter
+                  bg_color: Red #transparent
+                  border_width: 0
+                  on_click:
+                    then:
+                      - logger.log: "Centro del reloj pulsado"
+                      - mqtt.publish:
+                          topic: pantalla
+                          payload: "reloj_pulsado"                  
+
+        # Botón 5: Luz regulable RGB (altura doble)
+        - button: !include
+            file: modules/buttons/dimmer_light_button.yaml
+            vars:
+              uid: button_5
+              #height: $button_height_double
+              height: 0
+              enabled: false
+              text: RGB light
+              icon: $string_lights       # Icono de luces de cadena
+              entity_id: light.athom_rgb_light_d93662_rgb_light_strip # Luz RGB en HA
+
+        
